@@ -15,6 +15,10 @@ public class Library {
 
     private int nextMemberId = 1;
 
+    /**
+     * Lägger till en ny bok i biblioteket.
+     * Kastar LibraryException vid tomma fält eller om ISBN redan finns.
+     */
     public void addBook(Book book) throws LibraryException {
         if (book.title() == null || book.title().isBlank()
                 || book.author() == null || book.author().isBlank()
@@ -37,6 +41,10 @@ public class Library {
         bookCount++;
     }
 
+    /**
+     * Registrerar en ny medlem och tilldelar automatiskt ett unikt ID.
+     * Returnerar det tilldelade ID:t.
+     */
     public int registerMember(String name) throws LibraryException {
         if (name == null || name.isBlank()) {
             throw new LibraryException(LibraryException.ErrorType.INVALID_INPUT,
@@ -56,6 +64,11 @@ public class Library {
         return id;
     }
 
+    /**
+     * Lånar ut en bok till en medlem, givet boktitel och medlems-ID.
+     * Kontrollerar att boken och medlemmen finns, att boken inte redan är
+     * utlånad, och att medlemmen inte nått sin lånegräns.
+     */
     public void borrowBook(String title, int memberId) throws LibraryException {
         int bookIndex = findBookIndexByTitle(title);
         if (bookIndex == -1) {
@@ -92,6 +105,10 @@ public class Library {
         member.increaseLoanCount();
     }
 
+    /**
+     * Lämnar tillbaka en bok, givet boktitel.
+     * Kontrollerar att boken finns och faktiskt är utlånad.
+     */
     public void returnBook(String title) throws LibraryException {
         int bookIndex = findBookIndexByTitle(title);
         if (bookIndex == -1) {
@@ -113,6 +130,10 @@ public class Library {
         removeLoanAt(loanIndex);
     }
 
+    /**
+     * Söker efter böcker vars titel eller författare innehåller söktermen
+     * (skiftlägesokänsligt). Skriver resultatet direkt till konsolen.
+     */
     public void search(String query) {
         String lowerQuery = query.toLowerCase();
         boolean found = false;
@@ -134,6 +155,10 @@ public class Library {
         }
     }
 
+    /**
+     * Visar samtliga böcker, sorterade i bokstavsordning på titel,
+     * tillsammans med status (utlånad/tillgänglig och till vem).
+     */
     public void listAllBooks() {
         Book[] sortedBooks = getBooksSortedByTitle();
 
@@ -149,6 +174,9 @@ public class Library {
         }
     }
 
+    /**
+     * Hittar och visar den medlem som just nu har flest aktiva lån.
+     */
     public void showMemberWithMostLoans() {
         if (memberCount == 0) {
             System.out.println("Inga medlemmar är registrerade än.");
@@ -172,6 +200,7 @@ public class Library {
                 + " (ID: " + topMember.getId() + ") med " + topMember.getActiveLoans() + " lån.");
     }
 
+    // Skapar en ny bokarray med dubbel storlek och kopierar över befintliga element manuellt.
     private Book[] growBookArray() {
         Book[] newArray = new Book[books.length * 2];
         for (int i = 0; i < books.length; i++) {
@@ -180,6 +209,7 @@ public class Library {
         return newArray;
     }
 
+    // Skapar en ny medlemsarray med dubbel storlek och kopierar över befintliga element manuellt.
     private Member[] growMemberArray() {
         Member[] newArray = new Member[members.length * 2];
         for (int i = 0; i < members.length; i++) {
@@ -188,6 +218,7 @@ public class Library {
         return newArray;
     }
 
+    // Skapar en ny lånearray med dubbel storlek och kopierar över befintliga element manuellt.
     private Loan[] growLoanArray() {
         Loan[] newArray = new Loan[loans.length * 2];
         for (int i = 0; i < loans.length; i++) {
@@ -196,6 +227,8 @@ public class Library {
         return newArray;
     }
 
+    // Selection sort — hittar minsta (alfabetiskt tidigaste) titeln
+    // i den osorterade delen och byter plats med den, ett steg i taget.
     private Book[] getBooksSortedByTitle() {
         Book[] sorted = new Book[bookCount];
         for (int i = 0; i < bookCount; i++) {
@@ -219,6 +252,8 @@ public class Library {
         return sorted;
     }
 
+    // Formaterar text för utskrift: första bokstaven i varje ord versal, resten gemener.
+    // Ändrar inte det faktiskt lagrade värdet i Book/Member.
     private String capitalizeWords(String text) {
         if (text == null || text.isBlank()) {
             return text;
@@ -275,6 +310,8 @@ public class Library {
         return -1;
     }
 
+    // Tar bort lånet på angivet index och skiftar efterföljande element
+    // ett steg åt vänster, så att det inte blir ett "hål" i arrayen.
     private void removeLoanAt(int index) {
         for (int i = index; i < loanCount - 1; i++) {
             loans[i] = loans[i + 1];
