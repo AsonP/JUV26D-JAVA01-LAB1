@@ -123,7 +123,8 @@ public class Library {
             if (b.title().toLowerCase().contains(lowerQuery)
                     || b.author().toLowerCase().contains(lowerQuery)) {
                 String status = (findLoanIndexByBook(b) != -1) ? "Utlånad" : "Tillgänglig";
-                System.out.println("- " + b.title() + " av " + b.author() + " (ISBN: " + b.isbn() + ") [" + status + "]");
+                System.out.println("- " + capitalizeWords(b.title()) + " av " + capitalizeWords(b.author())
+                        + " (ISBN: " + b.isbn() + ") [" + status + "]");
                 found = true;
             }
         }
@@ -134,15 +135,63 @@ public class Library {
     }
 
     public void listAllBooks() {
-        System.out.println("Alla böcker:");
-        for (int i = 0; i < bookCount; i++) {
-            Book b = books[i];
+        Book[] sortedBooks = getBooksSortedByTitle();
+
+        System.out.println("Alla böcker (sorterade på titel):");
+        for (int i = 0; i < sortedBooks.length; i++) {
+            Book b = sortedBooks[i];
             int loanIndex = findLoanIndexByBook(b);
             String status = (loanIndex != -1)
-                    ? "Utlånad till " + loans[loanIndex].member().getName()
+                    ? "Utlånad till " + capitalizeWords(loans[loanIndex].member().getName())
                     : "Tillgänglig";
-            System.out.println("- " + b.title() + " av " + b.author() + " (ISBN: " + b.isbn() + ") [" + status + "]");
+            System.out.println("- " + capitalizeWords(b.title()) + " av " + capitalizeWords(b.author())
+                    + " (ISBN: " + b.isbn() + ") [" + status + "]");
         }
+    }
+
+    private Book[] getBooksSortedByTitle() {
+        Book[] sorted = new Book[bookCount];
+        for (int i = 0; i < bookCount; i++) {
+            sorted[i] = books[i];
+        }
+
+        // Selection sort — hittar minsta (alfabetiskt tidigaste) titeln
+        // i den osorterade delen och byter plats med den, ett steg i taget.
+        for (int i = 0; i < sorted.length - 1; i++) {
+            int minIndex = i;
+            for (int j = i + 1; j < sorted.length; j++) {
+                if (sorted[j].title().compareToIgnoreCase(sorted[minIndex].title()) < 0) {
+                    minIndex = j;
+                }
+            }
+            if (minIndex != i) {
+                Book temp = sorted[i];
+                sorted[i] = sorted[minIndex];
+                sorted[minIndex] = temp;
+            }
+        }
+
+        return sorted;
+    }
+
+    private String capitalizeWords(String text) {
+        if (text == null || text.isBlank()) {
+            return text;
+        }
+
+        String[] words = text.trim().split("\\s+");
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            result.append(Character.toUpperCase(word.charAt(0)));
+            result.append(word.substring(1).toLowerCase());
+            if (i < words.length - 1) {
+                result.append(" ");
+            }
+        }
+
+        return result.toString();
     }
 
     private int findBookIndexByTitle(String title) {
@@ -189,3 +238,4 @@ public class Library {
         loanCount--;
     }
 }
+
