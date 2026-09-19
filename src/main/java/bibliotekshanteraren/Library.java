@@ -16,19 +16,38 @@ public class Library {
     private int nextMemberId = 1;
 
     public void addBook(Book book) throws LibraryException {
+        if (book.title() == null || book.title().isBlank()
+                || book.author() == null || book.author().isBlank()
+                || book.isbn() == null || book.isbn().isBlank()) {
+            throw new LibraryException(LibraryException.ErrorType.INVALID_INPUT,
+                    "Titel, författare och ISBN måste vara ifyllda.");
+        }
+
+        if (findBookIndexByIsbn(book.isbn()) != -1) {
+            throw new LibraryException(LibraryException.ErrorType.DUPLICATE_ISBN,
+                    "En bok med ISBN " + book.isbn() + " finns redan.");
+        }
+
         if (bookCount >= CAPACITY) {
             throw new LibraryException(LibraryException.ErrorType.CAPACITY_EXCEEDED,
                     "Biblioteket är fullt (max " + CAPACITY + " böcker). Kan inte lägga till fler.");
         }
+
         books[bookCount] = book;
         bookCount++;
     }
 
     public int registerMember(String name) throws LibraryException {
+        if (name == null || name.isBlank()) {
+            throw new LibraryException(LibraryException.ErrorType.INVALID_INPUT,
+                    "Medlemsnamn måste vara ifyllt.");
+        }
+
         if (memberCount >= CAPACITY) {
             throw new LibraryException(LibraryException.ErrorType.CAPACITY_EXCEEDED,
                     "Max antal medlemmar (" + CAPACITY + ") är uppnått. Kan inte registrera fler.");
         }
+
         int id = nextMemberId;
         Member member = new Member(name, id);
         members[memberCount] = member;
@@ -129,6 +148,15 @@ public class Library {
     private int findBookIndexByTitle(String title) {
         for (int i = 0; i < bookCount; i++) {
             if (books[i].title().equalsIgnoreCase(title)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int findBookIndexByIsbn(String isbn) {
+        for (int i = 0; i < bookCount; i++) {
+            if (books[i].isbn().equals(isbn)) {
                 return i;
             }
         }

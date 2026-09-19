@@ -9,6 +9,9 @@ public class Member {
     private int activeLoans;
 
     public Member(String name, int id) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Namn kan inte vara tomt.");
+        }
         this.name = name;
         this.id = id;
         this.activeLoans = 0;
