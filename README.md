@@ -63,3 +63,19 @@ Menyval 7 hittar medlemmen med flest aktiva lån genom en enkel linjär genomsö
 ### Formatering vid utskrift
 
 Titlar, författarnamn och medlemsnamn formateras med en egen `capitalizeWords()`-metod vid utskrift (första bokstaven versal, resten gemener), utan att ändra det faktiskt lagrade värdet i `Book`/`Member`.
+
+
+### Dynamisk kapacitet
+
+`books[]`, `members[]` och `loans[]` börjar med en liten kapacitet (`CAPACITY`). När en array blir full skapas en ny array med dubbel storlek (`length * 2`), och alla befintliga element kopieras manuellt över med en egen loop — inte `Arrays.copyOf()`. Metoderna `growBookArray()`, `growMemberArray()` och `growLoanArray()` i `Library` sköter detta. En konsekvens av lösningen är att fälten `books`, `members` och `loans` inte längre kunde vara `final`, eftersom de behöver kunna peka om till en ny array vid växning.
+
+### Reflektion: arrayer kontra Collections Framework
+
+Hela projektet byggdes med fasta arrayer istället för `ArrayList`/`Collections`, vilket krävde en del kod som annars hade kommit "gratis":
+
+- **Dynamisk storlek** löstes manuellt genom att skapa nya, större arrayer och kopiera över innehållet (`growBookArray()` m.fl.). Med `ArrayList` hade detta inte behövts alls — listan växer automatiskt.
+- **Borttagning** av ett lån (`removeLoanAt()` i `Library`) krävde att vi manuellt skiftade alla efterföljande element ett steg åt vänster för att undvika "hål" i arrayen. `ArrayList.remove()` hade gjort detta åt oss.
+- **Sökning** (`findBookIndexByTitle`, `findMemberIndex` m.fl.) fick skrivas som egna linjära loopar. Med Collections Framework hade vi kunnat använda t.ex. `stream().filter()` eller `indexOf()` med en egen `equals()`-implementation.
+- **Sortering** (menyval 6) implementerades som en egen selection sort. Med Collections Framework hade `Collections.sort()` eller `list.sort(Comparator...)` gjort samma jobb på en rad kod.
+
+Att bygga detta manuellt med arrayer gav en tydligare förståelse för vad Collections Framework faktiskt gör "under huven" — särskilt växning av dynamiska strukturer och hantering av "hål" vid borttagning. Nackdelen är mer kod och fler platser där buggar (t.ex. off-by-one-fel vid array-skiftning) kan smyga sig in, vilket `ArrayList` hade skyddat oss från.

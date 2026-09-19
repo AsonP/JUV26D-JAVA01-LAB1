@@ -2,15 +2,15 @@ package bibliotekshanteraren;
 
 public class Library {
 
-    private static final int CAPACITY = 25;
+    private static final int CAPACITY = 3;
 
-    private final Book[] books = new Book[CAPACITY];
+    private Book[] books = new Book[CAPACITY];
     private int bookCount = 0;
 
-    private final Member[] members = new Member[CAPACITY];
+    private Member[] members = new Member[CAPACITY];
     private int memberCount = 0;
 
-    private final Loan[] loans = new Loan[CAPACITY];
+    private Loan[] loans = new Loan[CAPACITY];
     private int loanCount = 0;
 
     private int nextMemberId = 1;
@@ -28,9 +28,9 @@ public class Library {
                     "En bok med ISBN " + book.isbn() + " finns redan.");
         }
 
-        if (bookCount >= CAPACITY) {
-            throw new LibraryException(LibraryException.ErrorType.CAPACITY_EXCEEDED,
-                    "Biblioteket är fullt (max " + CAPACITY + " böcker). Kan inte lägga till fler.");
+        if (bookCount >= books.length) {
+            books = growBookArray();
+            System.out.println("Bokarrayen var full — kapaciteten utökades till " + books.length + ".");
         }
 
         books[bookCount] = book;
@@ -43,9 +43,9 @@ public class Library {
                     "Medlemsnamn måste vara ifyllt.");
         }
 
-        if (memberCount >= CAPACITY) {
-            throw new LibraryException(LibraryException.ErrorType.CAPACITY_EXCEEDED,
-                    "Max antal medlemmar (" + CAPACITY + ") är uppnått. Kan inte registrera fler.");
+        if (memberCount >= members.length) {
+            members = growMemberArray();
+            System.out.println("Medlemsarrayen var full — kapaciteten utökades till " + members.length + ".");
         }
 
         int id = nextMemberId;
@@ -82,9 +82,9 @@ public class Library {
                     "Medlemmen " + member.getName() + " har redan nått max antal lån.");
         }
 
-        if (loanCount >= CAPACITY) {
-            throw new LibraryException(LibraryException.ErrorType.CAPACITY_EXCEEDED,
-                    "Max antal samtidiga lån (" + CAPACITY + ") är uppnått.");
+        if (loanCount >= loans.length) {
+            loans = growLoanArray();
+            System.out.println("Lånearrayen var full — kapaciteten utökades till " + loans.length + ".");
         }
 
         loans[loanCount] = new Loan(book, member);
@@ -172,14 +172,36 @@ public class Library {
                 + " (ID: " + topMember.getId() + ") med " + topMember.getActiveLoans() + " lån.");
     }
 
+    private Book[] growBookArray() {
+        Book[] newArray = new Book[books.length * 2];
+        for (int i = 0; i < books.length; i++) {
+            newArray[i] = books[i];
+        }
+        return newArray;
+    }
+
+    private Member[] growMemberArray() {
+        Member[] newArray = new Member[members.length * 2];
+        for (int i = 0; i < members.length; i++) {
+            newArray[i] = members[i];
+        }
+        return newArray;
+    }
+
+    private Loan[] growLoanArray() {
+        Loan[] newArray = new Loan[loans.length * 2];
+        for (int i = 0; i < loans.length; i++) {
+            newArray[i] = loans[i];
+        }
+        return newArray;
+    }
+
     private Book[] getBooksSortedByTitle() {
         Book[] sorted = new Book[bookCount];
         for (int i = 0; i < bookCount; i++) {
             sorted[i] = books[i];
         }
 
-        // Selection sort — hittar minsta (alfabetiskt tidigaste) titeln
-        // i den osorterade delen och byter plats med den, ett steg i taget.
         for (int i = 0; i < sorted.length - 1; i++) {
             int minIndex = i;
             for (int j = i + 1; j < sorted.length; j++) {
