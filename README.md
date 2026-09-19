@@ -49,3 +49,17 @@ För att hålla koll på vilka böcker som är utlånade och till vem användes 
 ### Felhantering
 
 Vi valde en enda `LibraryException`-klass med en intern `ErrorType`-enum, istället för många separata exception-klasser (t.ex. `BookNotFoundException`, `MemberNotFoundException` osv.). Detta gav oss möjligheten att särskilja feltyper programmatiskt (om det skulle behövas) utan att skapa onödigt många klasser för ett projekt av den här storleken.
+
+## Påbyggnadsdel
+
+### Egen sorteringsalgoritm
+
+Menyval 6 sorterar böckerna på titel med en egen implementation av **selection sort** (`getBooksSortedByTitle()` i `Library`), istället för `Arrays.sort()`. Algoritmen går igenom den osorterade delen av arrayen, hittar det alfabetiskt tidigaste elementet, och byter plats med det till rätt position — ett steg i taget. Sorteringen görs på en kopia av `books[]`, så den ursprungliga insättningsordningen bevaras internt.
+
+### Statistik
+
+Menyval 7 hittar medlemmen med flest aktiva lån genom en enkel linjär genomsökning av `members[]` (`showMemberWithMostLoans()` i `Library`), utan att använda Streams eller Collections-metoder som `max()`.
+
+### Formatering vid utskrift
+
+Titlar, författarnamn och medlemsnamn formateras med en egen `capitalizeWords()`-metod vid utskrift (första bokstaven versal, resten gemener), utan att ändra det faktiskt lagrade värdet i `Book`/`Member`.

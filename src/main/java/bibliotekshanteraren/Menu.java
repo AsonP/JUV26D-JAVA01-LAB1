@@ -51,6 +51,10 @@ public class Menu {
                     listBooks();
                     pause();
                 }
+                case "7" -> {
+                    showMemberStats();
+                    pause();
+                }
                 case "e", "E" -> {
                     running = false;
                     System.out.println("Programmet avslutas...");
@@ -72,6 +76,7 @@ public class Menu {
         System.out.println("4. Lämna tillbaka bok");
         System.out.println("5. Sök bok (titel eller författare)");
         System.out.println("6. Visa alla böcker och status");
+        System.out.println("7. Visa medlem med flest aktiva lån");
         System.out.println("e. Avsluta");
         System.out.print("Välj ett alternativ: ");
     }
@@ -158,5 +163,9 @@ public class Menu {
 
     private void listBooks() {
         library.listAllBooks();
+    }
+
+    private void showMemberStats() {
+        library.showMemberWithMostLoans();
     }
 }

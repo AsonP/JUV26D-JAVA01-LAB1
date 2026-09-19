@@ -149,6 +149,29 @@ public class Library {
         }
     }
 
+    public void showMemberWithMostLoans() {
+        if (memberCount == 0) {
+            System.out.println("Inga medlemmar är registrerade än.");
+            return;
+        }
+
+        Member topMember = members[0];
+
+        for (int i = 1; i < memberCount; i++) {
+            if (members[i].getActiveLoans() > topMember.getActiveLoans()) {
+                topMember = members[i];
+            }
+        }
+
+        if (topMember.getActiveLoans() == 0) {
+            System.out.println("Ingen medlem har några aktiva lån just nu.");
+            return;
+        }
+
+        System.out.println("Medlem med flest aktiva lån: " + capitalizeWords(topMember.getName())
+                + " (ID: " + topMember.getId() + ") med " + topMember.getActiveLoans() + " lån.");
+    }
+
     private Book[] getBooksSortedByTitle() {
         Book[] sorted = new Book[bookCount];
         for (int i = 0; i < bookCount; i++) {
@@ -238,4 +261,3 @@ public class Library {
         loanCount--;
     }
 }
-
